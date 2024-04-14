@@ -4,8 +4,6 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"github.com/joho/godotenv"
-	"log"
 	"net/http"
 	url2 "net/url"
 	"os"
@@ -54,14 +52,13 @@ type Weather struct {
 	} `json:"current"`
 }
 
-func init() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
+func main() {
+	ApiKey := os.Getenv("API_KEY")
+	if ApiKey == "" {
+		fmt.Println("=*=*=* MAKE SURE TO SET THE API KEY IN ENVIRONMENT VARIABLES =*=*=*")
+		return
 	}
 
-}
-func main() {
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Print("Enter name of the city: ")
 	city, _ := reader.ReadString('\n')
@@ -69,7 +66,7 @@ func main() {
 	city = url2.QueryEscape(city)
 
 	url := fmt.Sprintf("https://api.weatherapi.com/v1/current.json?key=%s&q=%s",
-		os.Getenv("API_KEY"), city)
+		ApiKey, city)
 	response, err := http.Get(url)
 	if err != nil {
 		fmt.Println("Error: Unable to fetch weather information ")
@@ -84,7 +81,6 @@ func main() {
 		return
 	}
 
-	fmt.Printf("The present temperature is %.2f degree celsius",
-		weather.Current.FeelslikeC)
+	fmt.Printf("The present temperature is %.2f degree celsius\n", weather.Current.FeelslikeC)
 
 }
